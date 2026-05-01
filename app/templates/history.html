@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}Analysis History{% endblock %}
+
+{% block extra_style %}
+.history-page { padding: 3rem 0; }
+.page-title { font-family: var(--font-head); font-size: 3rem; letter-spacing: 3px; margin-bottom: .5rem; }
+
+.history-table { width: 100%; border-collapse: collapse; }
+.history-table th {
+  font-family: var(--font-mono); font-size: .7rem; letter-spacing: 2px;
+  color: var(--muted); text-align: left; padding: .75rem 1rem;
+  border-bottom: 1px solid var(--border); text-transform: uppercase;
+}
+.history-table td { padding: .75rem 1rem; border-bottom: 1px solid var(--border); font-size: .85rem; vertical-align: middle; }
+.history-table tr:last-child td { border-bottom: none; }
+.history-table tr:hover td { background: rgba(255,255,255,.015); }
+
+.text-clip { max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); }
+.score-cell { font-family: var(--font-mono); font-weight: 700; }
+.ts { font-family: var(--font-mono); font-size: .72rem; color: var(--muted); }
+
+.empty-state {
+  text-align: center; padding: 5rem 2rem;
+  font-family: var(--font-mono); color: var(--muted);
+}
+.empty-icon { font-size: 3rem; margin-bottom: 1rem; }
+
+.toolbar {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;
+}
+
+.clear-form { display: inline; }
+{% endblock %}
+
+{% block content %}
+<section class="history-page">
+  <div class="container">
+    <p style="font-family:var(--font-mono);font-size:.7rem;letter-spacing:3px;color:var(--accent);margin-bottom:.5rem;">// SESSION HISTORY</p>
+    <h1 class="page-title">PAST ANALYSES</h1>
+
+    <div class="toolbar">
+      <span style="font-family:var(--font-mono);font-size:.8rem;color:var(--muted);">
+        {{ records|length }} record(s) in this session
+      </span>
+      <div style="display:flex;gap:.75rem;flex-wrap:wrap;">
+        {% if records %}
+        <a href="/export/pdf" class="btn btn-outline">⬇ EXPORT PDF</a>
+        <a href="/export/txt" class="btn btn-ghost">⬇ EXPORT TXT</a>
+        <form class="clear-form" method="POST" action="/clear-history"
+              onsubmit="return confirm('Clear all history for this session?')">
+          <button type="submit" class="btn btn-ghost" style="color:var(--accent);">🗑 CLEAR</button>
+        </form>
+        {% endif %}
+        <a href="/" class="btn btn-primary">▶ NEW ANALYSIS</a>
+      </div>
+    </div>
+
+    {% if records %}
+    <div class="card" style="overflow-x:auto; padding:0;">
+      <table class="history-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Text</th>
+            <th>Score</th>
+            <th>Verdict</th>
+            <th>Source</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in records %}
+          <tr>
+            <td style="font-family:var(--font-mono);color:var(--muted);">{{ loop.index }}</td>
+            <td class="text-clip" title="{{ r.input_text }}">{{ r.input_text }}</td>
+            <td class="score-cell {% if r.risk=='high' %}risk-high{% else %}risk-low{% endif %}">
+              {{ r.score }}%
+            </td>
+            <td><span class="tag tag-{{ r.label | lower }}">{{ r.label }}</span></td>
+            <td><span class="tag" style="border-color:var(--border);color:var(--muted);">{{ r.source }}</span></td>
+            <td class="ts">{{ r.created_at[:16] }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">📭</div>
+      <p>No analyses yet in this session.</p>
+      <a href="/" class="btn btn-primary" style="margin-top:1.5rem;">Start Analysing</a>
+    </div>
+    {% endif %}
+
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,329 @@
+{% extends "base.html" %}
+
+{% block title %}Analysis Result — {{ record.label }}{% endblock %}
+
+{% block extra_style %}
+.result-page { padding: 3rem 0; }
+
+/* ── Score hero ── */
+.score-hero {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.score-hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(circle at 50% 0,
+    {% if record.risk == 'high' %}rgba(230,57,70,.12){% else %}rgba(6,214,160,.08){% endif %} 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.score-label {
+  font-family: var(--font-mono);
+  font-size: .7rem;
+  letter-spacing: 3px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.score-number {
+  font-family: var(--font-head);
+  font-size: clamp(5rem, 15vw, 10rem);
+  line-height: 1;
+  letter-spacing: -2px;
+  color: {% if record.risk == 'high' %}var(--accent){% else %}var(--accent2){% endif %};
+  margin-bottom: .5rem;
+}
+
+.score-verdict {
+  font-family: var(--font-head);
+  font-size: 2rem;
+  letter-spacing: 4px;
+  color: var(--text);
+  margin-bottom: 1rem;
+}
+
+.risk-pill {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: .8rem;
+  letter-spacing: 2px;
+  padding: .4rem 1.2rem;
+  border-radius: 50px;
+  {% if record.risk == 'high' %}
+  background: rgba(230,57,70,.15);
+  border: 1px solid rgba(230,57,70,.4);
+  color: var(--accent);
+  {% else %}
+  background: rgba(6,214,160,.1);
+  border: 1px solid rgba(6,214,160,.3);
+  color: var(--accent2);
+  {% endif %}
+}
+
+/* ── Gauge bar ── */
+.gauge-bar-wrap {
+  max-width: 360px;
+  margin: 1.5rem auto 0;
+}
+
+.gauge-track {
+  height: 6px;
+  background: var(--surface2);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.gauge-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: {% if record.risk == 'high' %}var(--accent){% else %}var(--accent2){% endif %};
+  width: 0;
+  transition: width 1.2s cubic-bezier(.22,.61,.36,1);
+}
+
+.gauge-ticks {
+  display: flex;
+  justify-content: space-between;
+  margin-top: .35rem;
+  font-family: var(--font-mono);
+  font-size: .65rem;
+  color: var(--muted);
+}
+
+/* ── Grid panels ── */
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+@media (max-width: 640px) {
+  .detail-grid { grid-template-columns: 1fr; }
+}
+
+.panel-title {
+  font-family: var(--font-mono);
+  font-size: .7rem;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+  padding-bottom: .5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ── Highlighted text ── */
+.text-display {
+  font-size: .9rem;
+  line-height: 1.8;
+  color: var(--text);
+  word-break: break-word;
+}
+
+/* ── Highlight bars ── */
+.highlight-item {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  margin-bottom: .6rem;
+}
+
+.hl-word {
+  font-family: var(--font-mono);
+  font-size: .8rem;
+  color: var(--accent);
+  min-width: 100px;
+}
+
+.hl-bar-wrap {
+  flex: 1;
+  height: 4px;
+  background: var(--surface2);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.hl-bar {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width .8s ease;
+  width: 0;
+}
+
+.hl-weight {
+  font-family: var(--font-mono);
+  font-size: .7rem;
+  color: var(--muted);
+  min-width: 40px;
+  text-align: right;
+}
+
+/* ── Markers ── */
+.marker-tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: .72rem;
+  padding: .25rem .7rem;
+  border: 1px solid rgba(230,57,70,.35);
+  background: rgba(230,57,70,.08);
+  color: var(--accent);
+  border-radius: 3px;
+  margin: .25rem .25rem 0 0;
+}
+
+/* ── Action bar ── */
+.action-bar {
+  display: flex;
+  gap: .75rem;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
+}
+
+/* ── Verdict icon ── */
+.verdict-icon { font-size: 2.5rem; margin-bottom: .5rem; }
+{% endblock %}
+
+{% block content %}
+<section class="result-page">
+  <div class="container">
+
+    <!-- Score hero -->
+    <div class="score-hero">
+      <div class="verdict-icon">
+        {% if record.risk == 'high' %}🎭{% else %}✅{% endif %}
+      </div>
+      <p class="score-label">// Sarcasm Probability Score</p>
+      <div class="score-number" id="score-display">{{ record.score }}%</div>
+      <div class="score-verdict">{{ record.label | upper }}</div>
+      <span class="risk-pill">
+        {% if record.risk == 'high' %}⚠ HIGH SARCASM RISK{% else %}✓ LOW SARCASM RISK{% endif %}
+      </span>
+
+      <div class="gauge-bar-wrap">
+        <div class="gauge-track">
+          <div class="gauge-fill" id="gauge-fill" data-val="{{ record.score }}"></div>
+        </div>
+        <div class="gauge-ticks">
+          <span>0%</span><span>SINCERE ←→ SARCASTIC</span><span>100%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detail grid -->
+    <div class="detail-grid">
+
+      <!-- Highlighted text -->
+      <div class="card" style="grid-column: 1 / -1;">
+        <p class="panel-title">// Input Text with Sarcasm Highlights</p>
+        <div class="text-display" id="highlighted-text">{{ record.input_text }}</div>
+      </div>
+
+      <!-- Top contributing words -->
+      <div class="card">
+        <p class="panel-title">// Top Contributing Terms (TF-IDF × Coefficient)</p>
+        {% if record.highlights %}
+          {% set max_w = record.highlights[0].weight %}
+          {% for h in record.highlights %}
+          <div class="highlight-item">
+            <span class="hl-word">{{ h.word }}</span>
+            <div class="hl-bar-wrap">
+              <div class="hl-bar" data-pct="{{ (h.weight / max_w * 100) | round }}"></div>
+            </div>
+            <span class="hl-weight">{{ "%.4f"|format(h.weight) }}</span>
+          </div>
+          {% endfor %}
+        {% else %}
+          <p style="color:var(--muted); font-size:.85rem;">No significant contributing terms found.</p>
+        {% endif %}
+      </div>
+
+      <!-- Markers & metadata -->
+      <div class="card">
+        <p class="panel-title">// Sarcasm Markers Detected</p>
+        {% if record.markers %}
+          {% for m in record.markers %}
+          <span class="marker-tag">{{ m }}</span>
+          {% endfor %}
+        {% else %}
+          <p style="color:var(--muted); font-size:.85rem;">No explicit sarcasm markers found.</p>
+        {% endif %}
+
+        <p class="panel-title" style="margin-top: 1.5rem;">// Meta</p>
+        <table style="width:100%; font-size:.8rem; font-family:var(--font-mono); color:var(--muted); border-collapse:collapse;">
+          <tr><td style="padding:.3rem 0; color:var(--text);">Score</td><td style="text-align:right;">{{ record.score }}%</td></tr>
+          <tr><td style="padding:.3rem 0; color:var(--text);">Label</td><td style="text-align:right;">{{ record.label }}</td></tr>
+          <tr><td style="padding:.3rem 0; color:var(--text);">Risk</td><td style="text-align:right;">{{ record.risk | upper }}</td></tr>
+          <tr><td style="padding:.3rem 0; color:var(--text);">Source</td><td style="text-align:right;">{{ record.source }}</td></tr>
+          <tr><td style="padding:.3rem 0; color:var(--text);">Recorded</td><td style="text-align:right;">{{ record.created_at[:16] }}</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="action-bar">
+      <a href="/" class="btn btn-primary">▶ NEW ANALYSIS</a>
+      <a href="/history" class="btn btn-outline">📋 VIEW HISTORY</a>
+      <a href="/export/pdf" class="btn btn-ghost">⬇ EXPORT PDF</a>
+      <a href="/export/txt" class="btn btn-ghost">⬇ EXPORT TXT</a>
+    </div>
+
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_script %}
+<script>
+  // Animate gauge bar
+  window.addEventListener("load", () => {
+    const fill = document.getElementById("gauge-fill");
+    const val  = parseFloat(fill.dataset.val);
+    setTimeout(() => { fill.style.width = val + "%"; }, 200);
+
+    // Animate highlight bars
+    document.querySelectorAll(".hl-bar").forEach(bar => {
+      const pct = bar.dataset.pct;
+      setTimeout(() => { bar.style.width = pct + "%"; }, 400);
+    });
+  });
+
+  // ── Phrase highlighting ────────────────────────────────────────────────
+  const highlights = {{ record.highlights | tojson }};
+  const markers    = {{ record.markers    | tojson }};
+  const textEl     = document.getElementById("highlighted-text");
+
+  function escapeRe(s) {
+    return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
+
+  function applyHighlights() {
+    let html = textEl.textContent;
+
+    // Marker phrases first (longer matches)
+    markers.forEach(m => {
+      const re = new RegExp("(" + escapeRe(m) + ")", "gi");
+      html = html.replace(re, '<mark class="sarcasm-mark">$1</mark>');
+    });
+
+    // Individual contributing words
+    highlights.forEach(h => {
+      const re = new RegExp("\\b(" + escapeRe(h.word) + ")\\b", "gi");
+      html = html.replace(re, '<mark class="sarcasm-mark">$1</mark>');
+    });
+
+    textEl.innerHTML = html;
+  }
+
+  if (highlights.length || markers.length) applyHighlights();
+</script>
+{% endblock %}
