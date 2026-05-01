@@ -2,43 +2,44 @@
 {% block title %}Bulk Analysis Results{% endblock %}
 
 {% block extra_style %}
-.bulk-page { padding: 3rem 0; }
-.page-title { font-family: var(--font-head); font-size: 3rem; letter-spacing: 3px; margin-bottom: .5rem; }
-.page-sub   { color: var(--muted); font-family: var(--font-mono); font-size: .8rem; margin-bottom: 2rem; }
+.bulk-page { padding: 4rem 0; }
+.page-title { font-size: 2.5rem; font-weight: 800; letter-spacing: -1px; margin-bottom: .5rem; }
+.page-sub   { color: var(--muted); font-size: 1rem; margin-bottom: 2.5rem; }
 
 .summary-strip {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem;
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 2.5rem;
 }
 @media(max-width:640px){ .summary-strip{grid-template-columns:1fr 1fr;} }
 
 .stat-card {
-  background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
-  padding: 1.25rem; text-align: center;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+  padding: 1.5rem; text-align: center;
+  box-shadow: var(--card-shadow);
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
-.stat-value { font-family: var(--font-head); font-size: 2.5rem; letter-spacing: 1px; }
-.stat-label { font-family: var(--font-mono); font-size: .65rem; letter-spacing: 2px; color: var(--muted); margin-top: .25rem; }
+.stat-value { font-size: 2.5rem; font-weight: 800; letter-spacing: -1px; line-height: 1; color: var(--text); }
+.stat-label { font-size: .75rem; font-weight: 700; letter-spacing: 1px; color: var(--muted); margin-top: .5rem; text-transform: uppercase; }
 
 .bulk-table { width: 100%; border-collapse: collapse; }
 .bulk-table th {
-  font-family: var(--font-mono); font-size: .7rem; letter-spacing: 2px;
-  color: var(--muted); text-align: left; padding: .75rem 1rem;
+  font-size: .75rem; font-weight: 700; letter-spacing: 1px;
+  color: var(--muted); text-align: left; padding: 1rem 1.5rem;
   border-bottom: 1px solid var(--border); text-transform: uppercase;
 }
-.bulk-table td { padding: .75rem 1rem; border-bottom: 1px solid var(--border); font-size: .85rem; vertical-align: top; }
+.bulk-table td { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); font-size: .9rem; vertical-align: middle; }
 .bulk-table tr:last-child td { border-bottom: none; }
-.bulk-table tr:hover td { background: rgba(255,255,255,.015); }
+.bulk-table tr:hover td { background: var(--surface2); }
 
-.text-clip { max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); }
-.score-cell { font-family: var(--font-mono); font-weight: 700; }
-.action-bar { display: flex; gap: .75rem; flex-wrap: wrap; margin-top: 1.5rem; }
+.text-clip { max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text); font-weight: 500; }
+.score-cell { font-weight: 700; }
+.action-bar { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 2rem; justify-content: center; }
 {% endblock %}
 
 {% block content %}
 <section class="bulk-page">
   <div class="container">
-    <p style="font-family:var(--font-mono);font-size:.7rem;letter-spacing:3px;color:var(--accent);margin-bottom:.5rem;">// BULK ANALYSIS</p>
-    <h1 class="page-title">FILE RESULTS</h1>
-    <p class="page-sub">{{ records|length }} text segment(s) analysed from uploaded file</p>
+    <h1 class="page-title">Bulk Analysis</h1>
+    <p class="page-sub">Analysis complete for {{ records|length }} segments from your file upload.</p>
 
     {% set sarcastic = records | selectattr("risk","eq","high") | list %}
     {% set sincere   = records | selectattr("risk","eq","low")  | list %}
@@ -47,10 +48,10 @@
     <div class="summary-strip">
       <div class="stat-card">
         <div class="stat-value">{{ records|length }}</div>
-        <div class="stat-label">Total Segments</div>
+        <div class="stat-label">Total</div>
       </div>
       <div class="stat-card">
-        <div class="stat-value" style="color:var(--accent);">{{ sarcastic|length }}</div>
+        <div class="stat-value" style="color:#ef4444;">{{ sarcastic|length }}</div>
         <div class="stat-label">Sarcastic</div>
       </div>
       <div class="stat-card">
@@ -63,24 +64,30 @@
       </div>
     </div>
 
-    <div class="card" style="overflow-x:auto;">
+    <div class="card" style="overflow-x:auto; padding:0;">
       <table class="bulk-table">
         <thead>
           <tr>
-            <th>#</th><th>Text</th><th>Score</th><th>Verdict</th><th>Top Phrase</th>
+            <th>Text Input</th>
+            <th>Confidence</th>
+            <th>Verdict</th>
+            <th>Leading Term</th>
           </tr>
         </thead>
         <tbody>
           {% for r in records %}
           <tr>
-            <td style="font-family:var(--font-mono);color:var(--muted);">{{ loop.index }}</td>
             <td class="text-clip" title="{{ r.input_text }}">{{ r.input_text }}</td>
             <td class="score-cell {% if r.risk=='high' %}risk-high{% else %}risk-low{% endif %}">
               {{ r.score }}%
             </td>
             <td><span class="tag tag-{{ r.label | lower }}">{{ r.label }}</span></td>
-            <td style="font-family:var(--font-mono);font-size:.75rem;color:var(--muted);">
-              {% if r.highlights %}{{ r.highlights[0].word }}{% else %}—{% endif %}
+            <td>
+              {% if r.highlights %}
+                <span style="font-size:.8rem; color:var(--muted); font-weight:600;">{{ r.highlights[0].word }}</span>
+              {% else %}
+                <span style="color:var(--border);">—</span>
+              {% endif %}
             </td>
           </tr>
           {% endfor %}
@@ -89,10 +96,10 @@
     </div>
 
     <div class="action-bar">
-      <a href="/"          class="btn btn-primary">▶ NEW ANALYSIS</a>
-      <a href="/history"   class="btn btn-outline">📋 HISTORY</a>
-      <a href="/export/pdf" class="btn btn-ghost">⬇ EXPORT PDF</a>
-      <a href="/export/txt" class="btn btn-ghost">⬇ EXPORT TXT</a>
+      <a href="/" class="btn btn-primary">New Analysis</a>
+      <a href="/history" class="btn btn-outline">View History</a>
+      <a href="/export/pdf" class="btn btn-ghost">Export PDF</a>
+      <a href="/export/txt" class="btn btn-ghost">Export TXT</a>
     </div>
   </div>
 </section>

@@ -24,6 +24,10 @@ from sklearn.metrics import classification_report
 try:
     import nltk
     from nltk.corpus import stopwords
+    try:
+        nltk.data.find("corpora/stopwords")
+    except LookupError:
+        nltk.download("stopwords", quiet=True)
     STOP_WORDS = set(stopwords.words("english"))
 except Exception:
     # Minimal built-in stopword list as fallback
@@ -300,4 +304,4 @@ def _extract_highlights(text: str, pipeline: Pipeline, top_n: int = 8
 
 def analyse_bulk(texts: List[str]) -> List[Dict]:
     """Run analyse_text on a list of texts (file upload)."""
-    return [analyse_text(t) for t in texts if t.strip()]
+    return [analyse_text(t) for t in texts]

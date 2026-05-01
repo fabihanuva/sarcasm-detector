@@ -6,15 +6,17 @@ Generate PDF or plain-text analysis reports.
 
 import io
 import json
-from datetime import datetime
+from datetime import datetime, timezone
+from xml.sax.saxutils import escape
 
 
 def export_as_text(records: list) -> bytes:
     """Return a UTF-8 plain-text report as bytes."""
+    now = datetime.now(timezone.utc)
     lines = [
         "═" * 60,
         "     SARCASM DETECTOR — ANALYSIS REPORT",
-        f"     Generated: {datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}",
+        f"     Generated: {now.strftime('%Y-%m-%d %H:%M UTC')}",
         "═" * 60,
         "",
     ]
@@ -58,10 +60,11 @@ def export_as_pdf(records: list) -> bytes:
         "Body2", parent=styles["Normal"], fontSize=9, leading=13
     )
 
+    now = datetime.now(timezone.utc)
     story = [
         Paragraph("Sarcasm Detector — Analysis Report", title_style),
         Paragraph(
-            f"Generated {datetime.utcnow().strftime('%d %B %Y, %H:%M UTC')} | "
+            f"Generated {now.strftime('%d %B %Y, %H:%M UTC')} | "
             f"{len(records)} record(s)",
             sub_style,
         ),
@@ -73,9 +76,9 @@ def export_as_pdf(records: list) -> bytes:
     for i, r in enumerate(records, 1):
         rows.append([
             str(i),
-            r["input_text"][:60] + ("…" if len(r["input_text"]) > 60 else ""),
+            escape(r["input_text"][:60]) + ("…" if len(r["input_text"]) > 60 else ""),
             f"{r['score']}%",
-            r["label"],
+            escape(r["label"]),
             r["risk"].upper(),
         ])
 
@@ -100,14 +103,19 @@ def export_as_pdf(records: list) -> bytes:
     # Detail paragraphs
     for i, r in enumerate(records, 1):
         colour = "#c0392b" if r["risk"] == "high" else "#27ae60"
+        label_esc = escape(r["label"])
+        score_esc = r["score"]
+        text_esc  = escape(r["input_text"][:300])
+        markers_esc = [escape(m) for m in r["markers"]]
+
         story.append(Paragraph(
-            f'<font color="{colour}"><b>[{i}] {r["label"]} — {r["score"]}%</b></font>',
+            f'<font color="{colour}"><b>[{i}] {label_esc} — {score_esc}%</b></font>',
             body_style,
         ))
-        story.append(Paragraph(f'<i>{r["input_text"][:300]}</i>', body_style))
-        if r["markers"]:
+        story.append(Paragraph(f'<i>{text_esc}</i>', body_style))
+        if markers_esc:
             story.append(Paragraph(
-                f'Sarcasm markers: {", ".join(r["markers"])}', body_style
+                f'Sarcasm markers: {", ".join(markers_esc)}', body_style
             ))
         story.append(Spacer(1, 0.3*cm))
 

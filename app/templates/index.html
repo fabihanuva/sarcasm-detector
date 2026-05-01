@@ -4,116 +4,122 @@
 
 {% block extra_style %}
 .hero {
-  padding: 4rem 0 2rem;
+  padding: 5rem 0 4rem;
   text-align: center;
 }
 
 .hero-eyebrow {
   font-family: var(--font-mono);
-  font-size: .75rem;
-  letter-spacing: 3px;
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: 1px;
   color: var(--accent);
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
   text-transform: uppercase;
 }
 
 .hero-title {
-  font-family: var(--font-head);
-  font-size: clamp(3rem, 8vw, 6rem);
-  line-height: .95;
-  letter-spacing: 3px;
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -1.5px;
   color: var(--text);
-  margin-bottom: .75rem;
+  margin-bottom: 1.5rem;
 }
 
-.hero-title em {
+.hero-title span {
   color: var(--accent);
-  font-style: normal;
 }
 
 .hero-sub {
   color: var(--muted);
-  font-size: .9rem;
-  max-width: 420px;
-  margin: 0 auto 2.5rem;
+  font-size: 1.1rem;
+  max-width: 580px;
+  margin: 0 auto;
   line-height: 1.6;
 }
 
 /* ── Tabs ── */
 .tabs {
   display: flex;
-  gap: 0;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  overflow: hidden;
-  margin-bottom: 1.25rem;
-  width: fit-content;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 1rem;
 }
 
 .tab-btn {
   background: transparent;
   border: none;
   color: var(--muted);
-  font-family: var(--font-mono);
-  font-size: .75rem;
-  letter-spacing: 1px;
-  padding: .6rem 1.4rem;
+  font-size: .9rem;
+  font-weight: 600;
+  padding: .5rem 0;
   cursor: pointer;
   transition: all .2s;
-  border-right: 1px solid var(--border);
+  position: relative;
 }
 
-.tab-btn:last-child { border-right: none; }
-.tab-btn.active { background: var(--accent); color: #fff; }
+.tab-btn.active { color: var(--accent); }
+.tab-btn.active::after {
+  content: '';
+  position: absolute; bottom: -1rem; left: 0; right: 0;
+  height: 2px; background: var(--accent);
+}
+
 .tab-btn:not(.active):hover { color: var(--text); }
 
 /* ── Form ── */
 .form-panel { display: none; }
-.form-panel.active { display: block; }
+.form-panel.active { display: block; animation: fadeIn .3s ease-out; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
 textarea {
   width: 100%;
-  min-height: 180px;
-  background: var(--surface2);
+  min-height: 200px;
+  background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: 8px;
   color: var(--text);
   font-family: var(--font-body);
-  font-size: .95rem;
-  padding: 1rem;
+  font-size: 1rem;
+  padding: 1.25rem;
   resize: vertical;
-  transition: border-color .2s;
+  transition: border-color .2s, box-shadow .2s, background-color 0.3s ease;
   line-height: 1.6;
 }
 
 textarea:focus {
   outline: none;
   border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
 }
 
-textarea::placeholder { color: var(--muted); }
-
 .char-count {
-  font-family: var(--font-mono);
-  font-size: .7rem;
+  font-size: .75rem;
   color: var(--muted);
   text-align: right;
-  margin-top: .4rem;
+  margin-top: .6rem;
 }
 
 .file-drop {
   border: 2px dashed var(--border);
-  border-radius: 8px;
-  padding: 3rem 2rem;
+  border-radius: 12px;
+  padding: 4rem 2rem;
   text-align: center;
   cursor: pointer;
   transition: all .2s;
   position: relative;
+  background: var(--bg);
 }
 
 .file-drop:hover, .file-drop.drag-over {
   border-color: var(--accent);
-  background: rgba(230,57,70,.04);
+  background: var(--surface);
 }
 
 .file-drop input[type=file] {
@@ -121,14 +127,14 @@ textarea::placeholder { color: var(--muted); }
 }
 
 .file-drop-icon {
-  font-size: 2.5rem;
-  margin-bottom: .75rem;
+  font-size: 2rem;
+  margin-bottom: 1rem;
   display: block;
 }
 
 .file-drop p {
   color: var(--muted);
-  font-size: .85rem;
+  font-size: .9rem;
   line-height: 1.5;
 }
 
@@ -136,156 +142,161 @@ textarea::placeholder { color: var(--muted); }
 
 .file-selected {
   display: none;
-  margin-top: 1rem;
-  padding: .75rem 1rem;
-  background: rgba(6,214,160,.08);
-  border: 1px solid rgba(6,214,160,.2);
-  border-radius: 4px;
-  font-family: var(--font-mono);
-  font-size: .8rem;
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: 8px;
+  font-size: .85rem;
   color: var(--accent2);
+  font-weight: 500;
 }
 
 .form-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 1.25rem;
+  margin-top: 2rem;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
 }
 
 .model-badge {
-  font-family: var(--font-mono);
-  font-size: .7rem;
+  font-size: .75rem;
   color: var(--muted);
-  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
 .model-badge span {
-  color: var(--accent2);
-  border: 1px solid rgba(6,214,160,.3);
-  padding: .15rem .4rem;
-  border-radius: 3px;
-  margin-left: .4rem;
+  color: var(--text);
+  font-weight: 600;
+  background: var(--surface2);
+  padding: .2rem .5rem;
+  border-radius: 4px;
 }
 
-/* ── Feature strip ── */
+/* ── Features ── */
 .features {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-  margin-top: 3rem;
+  gap: 1.5rem;
+  margin-top: 4rem;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .features { grid-template-columns: 1fr; }
 }
 
 .feature-card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 1.25rem;
+  border-radius: 12px;
+  padding: 2rem;
+  transition: transform .2s, box-shadow .2s, background-color 0.3s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
 }
 
 .feature-icon {
-  font-size: 1.5rem;
-  margin-bottom: .6rem;
+  font-size: 1.75rem;
+  margin-bottom: 1.25rem;
+  display: block;
 }
 
 .feature-card h3 {
-  font-family: var(--font-mono);
-  font-size: .8rem;
-  letter-spacing: 1px;
+  font-size: 1rem;
+  font-weight: 700;
   color: var(--text);
-  margin-bottom: .4rem;
-  text-transform: uppercase;
+  margin-bottom: .75rem;
 }
 
 .feature-card p {
-  font-size: .8rem;
+  font-size: .9rem;
   color: var(--muted);
-  line-height: 1.5;
+  line-height: 1.6;
 }
 {% endblock %}
 
 {% block content %}
 <section class="hero">
   <div class="container">
-    <p class="hero-eyebrow">// NLP Analysis Engine</p>
-    <h1 class="hero-title">DETECT<br/><em>SARCASM</em></h1>
+    <p class="hero-eyebrow">Natural Language Processing</p>
+    <h1 class="hero-title">Decode <span>Sarcasm</span> with Confidence</h1>
     <p class="hero-sub">
-      Paste text or upload a file. Our ML pipeline will score sarcasm probability,
-      highlight contributing phrases, and log your analysis history.
+      A sophisticated ML pipeline designed to detect linguistic nuance,
+      score probability, and provide explainable insights.
     </p>
   </div>
 </section>
 
-<section style="padding-bottom: 3rem;">
+<section style="padding-bottom: 6rem;">
   <div class="container">
     <div class="card">
-      <!-- Input type tabs -->
       <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('text', this)">TEXT INPUT</button>
-        <button class="tab-btn"        onclick="switchTab('file', this)">FILE UPLOAD</button>
+        <button class="tab-btn active" onclick="switchTab('text', this)">Text Input</button>
+        <button class="tab-btn"        onclick="switchTab('file', this)">File Upload</button>
       </div>
 
-      <!-- Text input form -->
       <form id="text-form" method="POST" action="/analyse" enctype="multipart/form-data">
         <div class="form-panel active" id="panel-text">
           <textarea
             name="text_input"
             id="text-area"
-            placeholder="Paste your text here… 'Oh wow, what a brilliant idea.' ← We'll catch it."
+            placeholder="Type or paste text to analyse..."
             maxlength="5000"
           ></textarea>
           <div class="char-count"><span id="char-count">0</span> / 5000</div>
         </div>
 
-        <!-- File upload panel (hidden input, same form) -->
         <div class="form-panel" id="panel-file">
           <div class="file-drop" id="file-drop">
             <input type="file" name="file" id="file-input" accept=".txt,.docx,.csv"
                    onchange="onFileSelect(this)" />
-            <span class="file-drop-icon">📂</span>
+            <span class="file-drop-icon">📄</span>
             <p>
-              <strong>Drag & drop</strong> or click to select<br/>
-              Supports <code>.txt</code> &nbsp;·&nbsp; <code>.docx</code> &nbsp;·&nbsp; <code>.csv</code>
+              <strong>Click to upload</strong> or drag and drop<br/>
+              Supports .txt, .docx, and .csv files
             </p>
           </div>
           <div class="file-selected" id="file-selected">
-            ✓ &nbsp;<span id="file-name"></span>
+            Selected: <span id="file-name"></span>
           </div>
         </div>
 
         <div class="form-footer">
           <div class="model-badge">
-            MODEL <span>TF-IDF + LinearSVC</span> &nbsp;|&nbsp; ENGINE <span>scikit-learn</span>
+            <span>TF-IDF + LinearSVC</span>
+            <span>scikit-learn 1.5.1</span>
           </div>
           <button type="submit" class="btn btn-primary">
-            ▶ &nbsp;RUN ANALYSIS
+            Run Analysis
           </button>
         </div>
       </form>
     </div>
 
-    <!-- Feature cards -->
     <div class="features">
       <div class="feature-card">
-        <div class="feature-icon">🎯</div>
-        <h3>Sarcasm Score</h3>
-        <p>Probability score 0–100% with risk level indicator (green/red).</p>
+        <span class="feature-icon">🎯</span>
+        <h3>Probability Scoring</h3>
+        <p>Advanced probability estimates provide a granular view of sarcasm confidence.</p>
       </div>
       <div class="feature-card">
-        <div class="feature-icon">🔦</div>
-        <h3>Phrase Highlighting</h3>
-        <p>TF-IDF × coefficient weights surface the exact words driving the verdict.</p>
+        <span class="feature-icon">🔦</span>
+        <h3>Explainable AI</h3>
+        <p>Interactive highlighting surfaces the exact terms driving the model's verdict.</p>
       </div>
       <div class="feature-card">
-        <div class="feature-icon">📋</div>
-        <h3>History & Export</h3>
-        <p>All analyses logged per session. Export your history as PDF or plain text.</p>
+        <span class="feature-icon">📋</span>
+        <h3>Session Records</h3>
+        <p>Complete history tracking with export capabilities for professional reporting.</p>
       </div>
     </div>
   </div>

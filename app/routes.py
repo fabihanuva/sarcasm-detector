@@ -81,10 +81,15 @@ def analyse():
         return redirect(url_for("main.index"))
 
     # ── Run inference ───────────────────────────────────────────────────
-    results  = analyse_bulk(texts)
+    valid_texts = [t for t in texts if t.strip()]
+    if not valid_texts:
+        flash("No valid text found to analyse.", "error")
+        return redirect(url_for("main.index"))
+
+    results  = analyse_bulk(valid_texts)
     record_ids = []
 
-    for text, result in zip(texts, results):
+    for text, result in zip(valid_texts, results):
         record = AnalysisRecord(
             session_id = db_session.id,
             input_text = text[:4000],        # cap stored length
@@ -111,7 +116,7 @@ def analyse():
 @main.route("/result/<int:record_id>")
 def result(record_id):
     """Single-analysis result page."""
-    record = AnalysisRecord.query.get_or_404(record_id)
+    record = db.get_or_404(AnalysisRecord, record_id)
     data   = record.to_dict()
     return render_template("result.html", record=data)
 

@@ -5,20 +5,35 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{% block title %}Sarcasm Detector{% endblock %}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
   <style>
     :root {
+      /* Base Colors (Light Theme Defaults) */
+      --bg:        #f8f9fa;
+      --surface:   #ffffff;
+      --surface2:  #f1f5f9;
+      --border:    #e2e8f0;
+      --accent:    #2563eb;
+      --accent2:   #10b981;
+      --text:      #111827;
+      --muted:     #64748b;
+      --font-body: 'Inter', sans-serif;
+      --font-mono: 'Space Mono', monospace;
+      --nav-bg:    rgba(255, 255, 255, 0.8);
+      --card-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    [data-theme="dark"] {
       --bg:        #0d0d14;
       --surface:   #13131f;
       --surface2:  #1c1c2e;
       --border:    #2a2a40;
-      --accent:    #e63946;
-      --accent2:   #06d6a0;
+      --accent:    #3b82f6;
+      --accent2:   #10b981;
       --text:      #e8e8f0;
-      --muted:     #6b6b8a;
-      --font-head: 'Bebas Neue', sans-serif;
-      --font-mono: 'Space Mono', monospace;
-      --font-body: 'Inter', sans-serif;
+      --muted:     #94a3b8;
+      --nav-bg:    rgba(13, 13, 20, 0.85);
+      --card-shadow: 0 4px 6px -1px rgba(0,0,0,0.2), 0 2px 4px -1px rgba(0,0,0,0.1);
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -28,77 +43,82 @@
       color: var(--text);
       font-family: var(--font-body);
       min-height: 100vh;
-      position: relative;
-      overflow-x: hidden;
-    }
-
-    /* Noise texture overlay */
-    body::before {
-      content: '';
-      position: fixed; inset: 0; z-index: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-      pointer-events: none;
-    }
-
-    /* Radial glow */
-    body::after {
-      content: '';
-      position: fixed;
-      top: -20vh; left: 50%;
-      transform: translateX(-50%);
-      width: 80vw; height: 60vh;
-      background: radial-gradient(ellipse, rgba(230,57,70,0.08) 0%, transparent 70%);
-      pointer-events: none; z-index: 0;
+      line-height: 1.5;
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
 
     /* ── Nav ── */
     nav {
-      position: relative; z-index: 10;
+      position: sticky; top: 0; z-index: 100;
       display: flex; align-items: center; justify-content: space-between;
       padding: 1rem 2rem;
       border-bottom: 1px solid var(--border);
-      background: rgba(13,13,20,0.85);
+      background: var(--nav-bg);
       backdrop-filter: blur(12px);
+      transition: background-color 0.3s ease, border-color 0.3s ease;
     }
 
+    .nav-left { display: flex; align-items: center; gap: 2rem; }
+
     .nav-logo {
-      font-family: var(--font-head);
-      font-size: 1.6rem;
-      letter-spacing: 2px;
-      color: var(--accent);
+      font-weight: 700;
+      font-size: 1.1rem;
+      letter-spacing: -0.5px;
+      color: var(--text);
       text-decoration: none;
     }
 
-    .nav-logo span { color: var(--text); }
+    .nav-logo span { color: var(--accent); }
 
     .nav-links a {
       color: var(--muted);
       text-decoration: none;
-      font-size: 0.8rem;
-      font-family: var(--font-mono);
-      margin-left: 2rem;
-      letter-spacing: 1px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      margin-left: 1.5rem;
       transition: color .2s;
     }
 
-    .nav-links a:hover { color: var(--text); }
+    .nav-links a:hover { color: var(--accent); }
+
+    /* ── Theme Toggle ── */
+    .theme-toggle {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: all 0.2s ease;
+    }
+
+    .theme-toggle:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .theme-toggle .sun { display: none; }
+    .theme-toggle .moon { display: block; }
+    [data-theme="dark"] .theme-toggle .sun { display: block; }
+    [data-theme="dark"] .theme-toggle .moon { display: none; }
 
     /* ── Main ── */
-    main { position: relative; z-index: 1; }
+    main { padding-top: 1rem; }
 
     /* ── Utility ── */
     .container { max-width: 900px; margin: 0 auto; padding: 0 1.5rem; }
 
     .btn {
       display: inline-flex; align-items: center; gap: .5rem;
-      padding: .65rem 1.4rem;
-      border-radius: 4px;
-      font-family: var(--font-mono);
-      font-size: .8rem;
-      letter-spacing: 1px;
+      padding: .6rem 1.2rem;
+      border-radius: 6px;
+      font-size: .85rem;
+      font-weight: 600;
       cursor: pointer;
       transition: all .2s;
-      border: none;
+      border: 1px solid transparent;
       text-decoration: none;
     }
 
@@ -107,80 +127,79 @@
       color: #fff;
     }
 
-    .btn-primary:hover { background: #ff4757; transform: translateY(-1px); }
+    .btn-primary:hover { background: #1d4ed8; transform: translateY(-1px); }
 
     .btn-outline {
-      background: transparent;
+      background: var(--surface);
       border: 1px solid var(--border);
       color: var(--text);
     }
 
-    .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-outline:hover { border-color: var(--accent); color: var(--accent); background: var(--surface2); }
 
     .btn-ghost {
       background: transparent;
       color: var(--muted);
-      border: 1px solid transparent;
     }
 
-    .btn-ghost:hover { color: var(--text); border-color: var(--border); }
+    .btn-ghost:hover { color: var(--text); background: var(--surface2); }
 
     /* ── Flash messages ── */
-    .flash-list { list-style: none; padding: 1rem 2rem; }
+    .flash-list { list-style: none; padding: 1rem 2rem; max-width: 900px; margin: 0 auto; }
     .flash-list li {
       padding: .75rem 1rem;
-      border-radius: 4px;
+      border-radius: 6px;
       font-size: .85rem;
-      font-family: var(--font-mono);
       margin-bottom: .5rem;
+      border: 1px solid transparent;
     }
-    .flash-error   { background: rgba(230,57,70,.15); border: 1px solid var(--accent); color: var(--accent); }
-    .flash-info    { background: rgba(6,214,160,.1);  border: 1px solid var(--accent2); color: var(--accent2); }
+    .flash-error   { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
+    .flash-info    { background: #ecfdf5; border-color: #d1fae5; color: #065f46; }
 
     /* ── Card ── */
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 1.5rem;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: var(--card-shadow);
+      transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
     }
 
     /* ── Score gauge colours ── */
-    .risk-high { color: var(--accent); }
+    .risk-high { color: #ef4444; }
     .risk-low  { color: var(--accent2); }
 
     /* ── Tag ── */
     .tag {
       display: inline-block;
-      font-family: var(--font-mono);
-      font-size: .7rem;
+      font-size: .75rem;
+      font-weight: 600;
       padding: .2rem .6rem;
-      border-radius: 3px;
-      letter-spacing: .5px;
+      border-radius: 4px;
     }
 
-    .tag-sarcastic { background: rgba(230,57,70,.15); color: var(--accent); border: 1px solid rgba(230,57,70,.3); }
-    .tag-sincere   { background: rgba(6,214,160,.1);  color: var(--accent2); border: 1px solid rgba(6,214,160,.3); }
+    .tag-sarcastic { background: #fee2e2; color: #b91c1c; }
+    .tag-sincere   { background: #dcfce7; color: #15803d; }
 
     /* ── Highlight ── */
     mark.sarcasm-mark {
-      background: rgba(230,57,70,.25);
-      color: #ff6b75;
+      background: #fef9c3;
+      color: #854d0e;
       border-radius: 2px;
       padding: 0 2px;
     }
 
     /* ── Footer ── */
     footer {
-      position: relative; z-index: 1;
       text-align: center;
-      padding: 2rem;
+      padding: 3rem 2rem;
       color: var(--muted);
-      font-family: var(--font-mono);
-      font-size: .7rem;
-      letter-spacing: 1px;
+      font-size: .8rem;
       border-top: 1px solid var(--border);
-      margin-top: 4rem;
+      margin-top: 5rem;
+      background: var(--surface);
+      transition: background-color 0.3s ease, border-color 0.3s ease;
     }
 
     {% block extra_style %}{% endblock %}
@@ -189,11 +208,17 @@
 <body>
 
 <nav>
-  <a class="nav-logo" href="/"><span>//</span>SARCASM<span>_</span>DETECTOR</a>
-  <div class="nav-links">
-    <a href="/">ANALYSE</a>
-    <a href="/history">HISTORY</a>
+  <div class="nav-left">
+    <a class="nav-logo" href="/">SARCASM<span>DETECTOR</span></a>
+    <div class="nav-links">
+      <a href="/">Analyse</a>
+      <a href="/history">History</a>
+    </div>
   </div>
+  <button class="theme-toggle" id="theme-toggle" title="Toggle Light/Dark Mode">
+    <span class="sun">☀️</span>
+    <span class="moon">🌙</span>
+  </button>
 </nav>
 
 {% with messages = get_flashed_messages(with_categories=true) %}
@@ -210,6 +235,27 @@
 
 <footer>// SARCASM_DETECTOR v1.0 — NLP ANALYSIS ENGINE — POWERED BY TF-IDF + LinearSVC //</footer>
 
+<script>
+  // ── Theme Management ───────────────────────────────────────────────────
+  const themeToggle = document.getElementById("theme-toggle");
+  const html = document.documentElement;
+
+  // Initialize theme from localStorage or system preference
+  const savedTheme = localStorage.getItem("theme");
+  if (savedTheme === "dark" || (!savedTheme && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+    html.setAttribute("data-theme", "dark");
+  }
+
+  themeToggle.addEventListener("click", () => {
+    if (html.getAttribute("data-theme") === "dark") {
+      html.removeAttribute("data-theme");
+      localStorage.setItem("theme", "light");
+    } else {
+      html.setAttribute("data-theme", "dark");
+      localStorage.setItem("theme", "dark");
+    }
+  });
+</script>
 {% block extra_script %}{% endblock %}
 </body>
 </html>

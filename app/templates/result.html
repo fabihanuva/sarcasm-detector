@@ -3,89 +3,77 @@
 {% block title %}Analysis Result — {{ record.label }}{% endblock %}
 
 {% block extra_style %}
-.result-page { padding: 3rem 0; }
+.result-page { padding: 4rem 0; }
 
 /* ── Score hero ── */
 .score-hero {
   text-align: center;
-  padding: 3rem 2rem;
+  padding: 4rem 2rem;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  margin-bottom: 2rem;
-  position: relative;
-  overflow: hidden;
-}
-
-.score-hero::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: radial-gradient(circle at 50% 0,
-    {% if record.risk == 'high' %}rgba(230,57,70,.12){% else %}rgba(6,214,160,.08){% endif %} 0%, transparent 65%);
-  pointer-events: none;
+  border-radius: 16px;
+  margin-bottom: 2.5rem;
+  box-shadow: var(--card-shadow);
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .score-label {
-  font-family: var(--font-mono);
-  font-size: .7rem;
-  letter-spacing: 3px;
+  font-size: .85rem;
+  font-weight: 600;
   color: var(--muted);
   text-transform: uppercase;
+  letter-spacing: 1px;
   margin-bottom: 1rem;
 }
 
 .score-number {
-  font-family: var(--font-head);
-  font-size: clamp(5rem, 15vw, 10rem);
+  font-size: clamp(4rem, 12vw, 6rem);
+  font-weight: 800;
   line-height: 1;
-  letter-spacing: -2px;
-  color: {% if record.risk == 'high' %}var(--accent){% else %}var(--accent2){% endif %};
-  margin-bottom: .5rem;
-}
-
-.score-verdict {
-  font-family: var(--font-head);
-  font-size: 2rem;
-  letter-spacing: 4px;
+  letter-spacing: -3px;
   color: var(--text);
   margin-bottom: 1rem;
 }
 
+.score-verdict {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 1.5rem;
+}
+
 .risk-pill {
   display: inline-block;
-  font-family: var(--font-mono);
-  font-size: .8rem;
-  letter-spacing: 2px;
-  padding: .4rem 1.2rem;
+  font-size: .85rem;
+  font-weight: 700;
+  padding: .5rem 1.5rem;
   border-radius: 50px;
   {% if record.risk == 'high' %}
-  background: rgba(230,57,70,.15);
-  border: 1px solid rgba(230,57,70,.4);
-  color: var(--accent);
+  background: #fee2e2;
+  color: #b91c1c;
   {% else %}
-  background: rgba(6,214,160,.1);
-  border: 1px solid rgba(6,214,160,.3);
-  color: var(--accent2);
+  background: #dcfce7;
+  color: #15803d;
   {% endif %}
 }
 
 /* ── Gauge bar ── */
 .gauge-bar-wrap {
-  max-width: 360px;
-  margin: 1.5rem auto 0;
+  max-width: 400px;
+  margin: 2.5rem auto 0;
 }
 
 .gauge-track {
-  height: 6px;
+  height: 8px;
   background: var(--surface2);
-  border-radius: 3px;
+  border-radius: 4px;
   overflow: hidden;
 }
 
 .gauge-fill {
   height: 100%;
-  border-radius: 3px;
-  background: {% if record.risk == 'high' %}var(--accent){% else %}var(--accent2){% endif %};
+  border-radius: 4px;
+  background: {% if record.risk == 'high' %}#ef4444{% else %}var(--accent){% endif %};
   width: 0;
   transition: width 1.2s cubic-bezier(.22,.61,.36,1);
 }
@@ -93,9 +81,9 @@
 .gauge-ticks {
   display: flex;
   justify-content: space-between;
-  margin-top: .35rem;
-  font-family: var(--font-mono);
-  font-size: .65rem;
+  margin-top: .75rem;
+  font-size: .75rem;
+  font-weight: 600;
   color: var(--muted);
 }
 
@@ -103,111 +91,113 @@
 .detail-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.25rem;
-  margin-bottom: 1.25rem;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .detail-grid { grid-template-columns: 1fr; }
 }
 
 .panel-title {
-  font-family: var(--font-mono);
-  font-size: .7rem;
-  letter-spacing: 2px;
+  font-size: .75rem;
+  font-weight: 700;
   color: var(--muted);
   text-transform: uppercase;
-  margin-bottom: 1rem;
-  padding-bottom: .5rem;
+  letter-spacing: 1px;
+  margin-bottom: 1.25rem;
+  padding-bottom: .75rem;
   border-bottom: 1px solid var(--border);
 }
 
 /* ── Highlighted text ── */
 .text-display {
-  font-size: .9rem;
+  font-size: 1.05rem;
   line-height: 1.8;
   color: var(--text);
-  word-break: break-word;
 }
 
 /* ── Highlight bars ── */
 .highlight-item {
   display: flex;
   align-items: center;
-  gap: .75rem;
-  margin-bottom: .6rem;
+  gap: 1rem;
+  margin-bottom: .75rem;
 }
 
 .hl-word {
-  font-family: var(--font-mono);
-  font-size: .8rem;
-  color: var(--accent);
-  min-width: 100px;
+  font-size: .9rem;
+  font-weight: 600;
+  color: var(--text);
+  min-width: 120px;
 }
 
 .hl-bar-wrap {
   flex: 1;
-  height: 4px;
+  height: 6px;
   background: var(--surface2);
-  border-radius: 2px;
+  border-radius: 3px;
   overflow: hidden;
 }
 
 .hl-bar {
   height: 100%;
   background: var(--accent);
-  border-radius: 2px;
+  border-radius: 3px;
   transition: width .8s ease;
   width: 0;
 }
 
 .hl-weight {
   font-family: var(--font-mono);
-  font-size: .7rem;
+  font-size: .75rem;
   color: var(--muted);
-  min-width: 40px;
+  min-width: 50px;
   text-align: right;
 }
 
 /* ── Markers ── */
 .marker-tag {
   display: inline-block;
-  font-family: var(--font-mono);
-  font-size: .72rem;
-  padding: .25rem .7rem;
-  border: 1px solid rgba(230,57,70,.35);
-  background: rgba(230,57,70,.08);
-  color: var(--accent);
-  border-radius: 3px;
-  margin: .25rem .25rem 0 0;
+  font-size: .8rem;
+  font-weight: 600;
+  padding: .35rem .75rem;
+  background: var(--surface2);
+  color: var(--text);
+  border-radius: 6px;
+  margin: 0 .5rem .5rem 0;
 }
 
 /* ── Action bar ── */
 .action-bar {
   display: flex;
-  gap: .75rem;
+  gap: 1rem;
   flex-wrap: wrap;
-  margin-top: 1.5rem;
+  margin-top: 2rem;
+  justify-content: center;
 }
 
-/* ── Verdict icon ── */
-.verdict-icon { font-size: 2.5rem; margin-bottom: .5rem; }
+.meta-table {
+  width: 100%;
+  font-size: .85rem;
+  color: var(--muted);
+  border-collapse: collapse;
+}
+
+.meta-table td { padding: .5rem 0; }
+.meta-table td:last-child { text-align: right; color: var(--text); font-weight: 600; }
 {% endblock %}
 
 {% block content %}
 <section class="result-page">
   <div class="container">
 
-    <!-- Score hero -->
     <div class="score-hero">
-      <div class="verdict-icon">
-        {% if record.risk == 'high' %}🎭{% else %}✅{% endif %}
-      </div>
-      <p class="score-label">// Sarcasm Probability Score</p>
+      <p class="score-label">Sarcasm Probability</p>
       <div class="score-number" id="score-display">{{ record.score }}%</div>
-      <div class="score-verdict">{{ record.label | upper }}</div>
+      <div class="score-verdict">{{ record.label }} Verdict</div>
       <span class="risk-pill">
-        {% if record.risk == 'high' %}⚠ HIGH SARCASM RISK{% else %}✓ LOW SARCASM RISK{% endif %}
+        {% if record.risk == 'high' %}High Sarcasm Risk{% else %}Low Sarcasm Risk{% endif %}
       </span>
 
       <div class="gauge-bar-wrap">
@@ -215,23 +205,19 @@
           <div class="gauge-fill" id="gauge-fill" data-val="{{ record.score }}"></div>
         </div>
         <div class="gauge-ticks">
-          <span>0%</span><span>SINCERE ←→ SARCASTIC</span><span>100%</span>
+          <span>Sincere</span><span>{{ record.score }}%</span><span>Sarcastic</span>
         </div>
       </div>
     </div>
 
-    <!-- Detail grid -->
     <div class="detail-grid">
-
-      <!-- Highlighted text -->
       <div class="card" style="grid-column: 1 / -1;">
-        <p class="panel-title">// Input Text with Sarcasm Highlights</p>
+        <p class="panel-title">Analysed Text</p>
         <div class="text-display" id="highlighted-text">{{ record.input_text }}</div>
       </div>
 
-      <!-- Top contributing words -->
       <div class="card">
-        <p class="panel-title">// Top Contributing Terms (TF-IDF × Coefficient)</p>
+        <p class="panel-title">Contributing Terms</p>
         {% if record.highlights %}
           {% set max_w = record.highlights[0].weight %}
           {% for h in record.highlights %}
@@ -244,38 +230,37 @@
           </div>
           {% endfor %}
         {% else %}
-          <p style="color:var(--muted); font-size:.85rem;">No significant contributing terms found.</p>
+          <p style="color:var(--muted); font-size:.9rem;">No significant contributing terms found.</p>
         {% endif %}
       </div>
 
-      <!-- Markers & metadata -->
       <div class="card">
-        <p class="panel-title">// Sarcasm Markers Detected</p>
+        <p class="panel-title">Linguistic Markers</p>
         {% if record.markers %}
-          {% for m in record.markers %}
-          <span class="marker-tag">{{ m }}</span>
-          {% endfor %}
+          <div style="margin-bottom: 2rem;">
+            {% for m in record.markers %}
+            <span class="marker-tag">{{ m }}</span>
+            {% endfor %}
+          </div>
         {% else %}
-          <p style="color:var(--muted); font-size:.85rem;">No explicit sarcasm markers found.</p>
+          <p style="color:var(--muted); font-size:.9rem; margin-bottom: 2rem;">No explicit markers detected.</p>
         {% endif %}
 
-        <p class="panel-title" style="margin-top: 1.5rem;">// Meta</p>
-        <table style="width:100%; font-size:.8rem; font-family:var(--font-mono); color:var(--muted); border-collapse:collapse;">
-          <tr><td style="padding:.3rem 0; color:var(--text);">Score</td><td style="text-align:right;">{{ record.score }}%</td></tr>
-          <tr><td style="padding:.3rem 0; color:var(--text);">Label</td><td style="text-align:right;">{{ record.label }}</td></tr>
-          <tr><td style="padding:.3rem 0; color:var(--text);">Risk</td><td style="text-align:right;">{{ record.risk | upper }}</td></tr>
-          <tr><td style="padding:.3rem 0; color:var(--text);">Source</td><td style="text-align:right;">{{ record.source }}</td></tr>
-          <tr><td style="padding:.3rem 0; color:var(--text);">Recorded</td><td style="text-align:right;">{{ record.created_at[:16] }}</td></tr>
+        <p class="panel-title">Analysis Metadata</p>
+        <table class="meta-table">
+          <tr><td>Confidence Score</td><td>{{ record.score }}%</td></tr>
+          <tr><td>Final Label</td><td>{{ record.label }}</td></tr>
+          <tr><td>Source Type</td><td>{{ record.source | capitalize }}</td></tr>
+          <tr><td>Processed At</td><td>{{ record.created_at[:16] }}</td></tr>
         </table>
       </div>
     </div>
 
-    <!-- Actions -->
     <div class="action-bar">
-      <a href="/" class="btn btn-primary">▶ NEW ANALYSIS</a>
-      <a href="/history" class="btn btn-outline">📋 VIEW HISTORY</a>
-      <a href="/export/pdf" class="btn btn-ghost">⬇ EXPORT PDF</a>
-      <a href="/export/txt" class="btn btn-ghost">⬇ EXPORT TXT</a>
+      <a href="/" class="btn btn-primary">New Analysis</a>
+      <a href="/history" class="btn btn-outline">View History</a>
+      <a href="/export/pdf" class="btn btn-ghost">Export PDF</a>
+      <a href="/export/txt" class="btn btn-ghost">Export TXT</a>
     </div>
 
   </div>
@@ -297,7 +282,7 @@
     });
   });
 
-  // ── Phrase highlighting ────────────────────────────────────────────────
+  // ── Phrase highlighting (Safe Implementation) ─────────────────────────
   const highlights = {{ record.highlights | tojson }};
   const markers    = {{ record.markers    | tojson }};
   const textEl     = document.getElementById("highlighted-text");
@@ -307,21 +292,34 @@
   }
 
   function applyHighlights() {
-    let html = textEl.textContent;
+    let text = textEl.textContent;
+    let placeholders = [];
 
-    // Marker phrases first (longer matches)
-    markers.forEach(m => {
-      const re = new RegExp("(" + escapeRe(m) + ")", "gi");
-      html = html.replace(re, '<mark class="sarcasm-mark">$1</mark>');
+    // Combine and sort by length (longest first)
+    const targets = [
+      ...markers.map(m => ({ val: m, isWord: false })),
+      ...highlights.map(h => ({ val: h.word, isWord: true }))
+    ].sort((a, b) => b.val.length - a.val.length);
+
+    targets.forEach(target => {
+      const pattern = target.isWord ? `\\b(${escapeRe(target.val)})\\b` : `(${escapeRe(target.val)})`;
+      const re = new RegExp(pattern, "gi");
+
+      text = text.replace(re, (match) => {
+        // Only replace if not already part of a placeholder
+        const id = `___HL${placeholders.length}___`;
+        placeholders.push({ id, match });
+        return id;
+      });
     });
 
-    // Individual contributing words
-    highlights.forEach(h => {
-      const re = new RegExp("\\b(" + escapeRe(h.word) + ")\\b", "gi");
-      html = html.replace(re, '<mark class="sarcasm-mark">$1</mark>');
+    // Final pass: inject HTML tags
+    let finalHtml = text;
+    placeholders.forEach(p => {
+      finalHtml = finalHtml.replace(p.id, `<mark class="sarcasm-mark">${p.match}</mark>`);
     });
 
-    textEl.innerHTML = html;
+    textEl.innerHTML = finalHtml;
   }
 
   if (highlights.length || markers.length) applyHighlights();

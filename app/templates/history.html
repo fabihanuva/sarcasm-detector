@@ -2,32 +2,32 @@
 {% block title %}Analysis History{% endblock %}
 
 {% block extra_style %}
-.history-page { padding: 3rem 0; }
-.page-title { font-family: var(--font-head); font-size: 3rem; letter-spacing: 3px; margin-bottom: .5rem; }
+.history-page { padding: 4rem 0; }
+.page-title { font-size: 2.5rem; font-weight: 800; letter-spacing: -1px; margin-bottom: .5rem; }
 
 .history-table { width: 100%; border-collapse: collapse; }
 .history-table th {
-  font-family: var(--font-mono); font-size: .7rem; letter-spacing: 2px;
-  color: var(--muted); text-align: left; padding: .75rem 1rem;
+  font-size: .75rem; font-weight: 700; letter-spacing: 1px;
+  color: var(--muted); text-align: left; padding: 1rem 1.5rem;
   border-bottom: 1px solid var(--border); text-transform: uppercase;
 }
-.history-table td { padding: .75rem 1rem; border-bottom: 1px solid var(--border); font-size: .85rem; vertical-align: middle; }
+.history-table td { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); font-size: .9rem; vertical-align: middle; }
 .history-table tr:last-child td { border-bottom: none; }
-.history-table tr:hover td { background: rgba(255,255,255,.015); }
+.history-table tr:hover td { background: var(--surface2); }
 
-.text-clip { max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); }
-.score-cell { font-family: var(--font-mono); font-weight: 700; }
-.ts { font-family: var(--font-mono); font-size: .72rem; color: var(--muted); }
+.text-clip { max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text); font-weight: 500; }
+.score-cell { font-weight: 700; }
+.ts { font-size: .8rem; color: var(--muted); }
 
 .empty-state {
-  text-align: center; padding: 5rem 2rem;
-  font-family: var(--font-mono); color: var(--muted);
+  text-align: center; padding: 6rem 2rem;
+  color: var(--muted);
 }
-.empty-icon { font-size: 3rem; margin-bottom: 1rem; }
+.empty-icon { font-size: 3rem; margin-bottom: 1.5rem; display: block; }
 
 .toolbar {
   display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;
+  margin-bottom: 2rem; flex-wrap: wrap; gap: 1.5rem;
 }
 
 .clear-form { display: inline; }
@@ -36,23 +36,25 @@
 {% block content %}
 <section class="history-page">
   <div class="container">
-    <p style="font-family:var(--font-mono);font-size:.7rem;letter-spacing:3px;color:var(--accent);margin-bottom:.5rem;">// SESSION HISTORY</p>
-    <h1 class="page-title">PAST ANALYSES</h1>
+    <h1 class="page-title">Session History</h1>
+    <p style="color:var(--muted); font-size:1rem; margin-bottom:2.5rem;">
+      Review and export your recent sarcasm analyses.
+    </p>
 
     <div class="toolbar">
-      <span style="font-family:var(--font-mono);font-size:.8rem;color:var(--muted);">
-        {{ records|length }} record(s) in this session
+      <span style="font-size:.9rem; font-weight:600; color:var(--muted);">
+        {{ records|length }} total records
       </span>
-      <div style="display:flex;gap:.75rem;flex-wrap:wrap;">
+      <div style="display:flex; gap:1rem; flex-wrap:wrap;">
         {% if records %}
-        <a href="/export/pdf" class="btn btn-outline">⬇ EXPORT PDF</a>
-        <a href="/export/txt" class="btn btn-ghost">⬇ EXPORT TXT</a>
+        <a href="/export/pdf" class="btn btn-outline">Export PDF</a>
+        <a href="/export/txt" class="btn btn-outline">Export TXT</a>
         <form class="clear-form" method="POST" action="/clear-history"
               onsubmit="return confirm('Clear all history for this session?')">
-          <button type="submit" class="btn btn-ghost" style="color:var(--accent);">🗑 CLEAR</button>
+          <button type="submit" class="btn btn-ghost" style="color:#ef4444;">Clear All</button>
         </form>
         {% endif %}
-        <a href="/" class="btn btn-primary">▶ NEW ANALYSIS</a>
+        <a href="/" class="btn btn-primary">New Analysis</a>
       </div>
     </div>
 
@@ -61,24 +63,22 @@
       <table class="history-table">
         <thead>
           <tr>
-            <th>#</th>
-            <th>Text</th>
-            <th>Score</th>
+            <th>Text Input</th>
+            <th>Confidence</th>
             <th>Verdict</th>
             <th>Source</th>
-            <th>Date</th>
+            <th>Processed</th>
           </tr>
         </thead>
         <tbody>
           {% for r in records %}
           <tr>
-            <td style="font-family:var(--font-mono);color:var(--muted);">{{ loop.index }}</td>
             <td class="text-clip" title="{{ r.input_text }}">{{ r.input_text }}</td>
             <td class="score-cell {% if r.risk=='high' %}risk-high{% else %}risk-low{% endif %}">
               {{ r.score }}%
             </td>
             <td><span class="tag tag-{{ r.label | lower }}">{{ r.label }}</span></td>
-            <td><span class="tag" style="border-color:var(--border);color:var(--muted);">{{ r.source }}</span></td>
+            <td><span style="font-size:.8rem; color:var(--muted); font-weight:500;">{{ r.source | capitalize }}</span></td>
             <td class="ts">{{ r.created_at[:16] }}</td>
           </tr>
           {% endfor %}
@@ -86,10 +86,13 @@
       </table>
     </div>
     {% else %}
-    <div class="empty-state">
-      <div class="empty-icon">📭</div>
-      <p>No analyses yet in this session.</p>
-      <a href="/" class="btn btn-primary" style="margin-top:1.5rem;">Start Analysing</a>
+    <div class="card">
+      <div class="empty-state">
+        <span class="empty-icon">📂</span>
+        <p style="font-size:1.1rem; font-weight:600; color:var(--text); margin-bottom:.5rem;">No history found</p>
+        <p>Start your first analysis to see results here.</p>
+        <a href="/" class="btn btn-primary" style="margin-top:2rem;">Get Started</a>
+      </div>
     </div>
     {% endif %}
 

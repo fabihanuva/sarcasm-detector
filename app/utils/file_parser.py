@@ -44,7 +44,14 @@ def _parse_csv(fs) -> List[str]:
     content = fs.read().decode("utf-8", errors="ignore")
     reader  = csv.reader(io.StringIO(content))
     lines   = []
-    for row in reader:
+    
+    # Simple header detection: skip if first row contains common header keywords
+    header_keywords = {"text", "headline", "content", "message", "input", "label", "is_sarcastic"}
+    
+    for i, row in enumerate(reader):
+        if i == 0 and any(cell.lower() in header_keywords for cell in row):
+            continue
+        
         line = " ".join(cell.strip() for cell in row if cell.strip())
         if line:
             lines.append(line)
